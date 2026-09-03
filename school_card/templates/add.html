@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}新增登记 - 荆楚理工移动卡登记{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-title">新增登记</div>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label class="form-label" for="{{ form.student_id.id }}">学号 *</label>
+            {{ form.student_id(class="form-control", placeholder="请输入学号") }}
+            {% for error in form.student_id.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.name.id }}">姓名 *</label>
+            {{ form.name(class="form-control", placeholder="请输入学生姓名") }}
+            {% for error in form.name.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.college.id }}">学院 *</label>
+            {{ form.college(class="form-control") }}
+            {% for error in form.college.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.phone_card_number.id }}">电话卡号 *</label>
+            {{ form.phone_card_number(class="form-control", placeholder="请输入电话卡号") }}
+            {% for error in form.phone_card_number.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.original_phone.id }}">原手机号 *</label>
+            {{ form.original_phone(class="form-control", placeholder="请输入11位原手机号") }}
+            {% for error in form.original_phone.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="{{ form.status.id }}">办理状态 *</label>
+            {{ form.status(class="form-control") }}
+            {% for error in form.status.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:24px;">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('students.index') }}" class="btn btn-outline">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

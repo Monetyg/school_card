@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}学生列表 - 荆楚理工移动卡登记{% endblock %}
+{% block content %}
+{% set status_styles = {"未办理": "badge-pending", "办理中": "badge-processing", "已办理": "badge-done", "已激活": "badge-activated"} %}
+
+<div class="card">
+    <div class="toolbar">
+        <a href="{{ url_for('students.add') }}" class="btn btn-primary">+ 新增登记</a>
+        <form class="search-form" method="get">
+            <input type="text" class="form-control" name="search" placeholder="搜索学号/姓名/学院/卡号/原手机号/状态" value="{{ search }}">
+            <button type="submit" class="btn btn-outline">搜索</button>
+            {% if search %}
+                <a href="{{ url_for('students.index') }}" class="btn btn-outline">清除</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if students %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>学院</th>
+                    <th>电话卡号</th>
+                    <th>原手机号</th>
+                    <th>办理状态</th>
+                    <th>登记时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><code>{{ student.student_id }}</code></td>
+                    <td><strong>{{ student.name }}</strong></td>
+                    <td>{{ student.college }}</td>
+                    <td><code>{{ student.phone_card_number }}</code></td>
+                    <td>{{ student.original_phone }}</td>
+                    <td>
+                        <span class="badge {{ status_styles.get(student.status, 'badge-pending') }}">
+                            {{ student.status }}
+                        </span>
+                    </td>
+                    <td>{{ student.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <div class="row-actions">
+                            <form method="post" action="{{ url_for('students.update_status', student_id=student.id) }}" class="inline-status-form">
+                                <select name="status" onchange="this.form.submit()">
+                                    {% for s in status_choices %}
+                                        <option value="{{ s }}" {% if s == student.status %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                            <a href="{{ url_for('students.edit', student_id=student.id) }}" class="btn btn-sm btn-outline">编辑</a>
+                            <form method="post" action="{{ url_for('students.delete', student_id=student.id) }}" class="delete-form" onsubmit="return confirm('确定要删除 {{ student.name }} 的记录吗？')">
+                                <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('students.index', page=pagination.prev_num, search=search) }}" class="page-btn">上一页</a>
+        {% endif %}
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                <a href="{{ url_for('students.index', page=page_num, search=search) }}" class="page-btn {% if page_num == pagination.page %}current{% endif %}">{{ page_num }}</a>
+            {% else %}
+                <span class="page-btn">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+            <a href="{{ url_for('students.index', page=pagination.next_num, search=search) }}" class="page-btn">下一页</a>
+        {% endif %}
+    </div>
+    <div class="page-info">共 {{ pagination.total }} 条记录，第 {{ pagination.page }} / {{ pagination.pages }} 页</div>
+    {% endif %}
+
+    {% else %}
+    <div style="text-align:center;padding:60px 0;color:var(--gray-500);">
+        {% if search %}
+            <p>未找到匹配 "{{ search }}" 的学生记录</p>
+            <a href="{{ url_for('students.index') }}" class="btn btn-outline" style="margin-top:12px;">清除搜索</a>
+        {% else %}
+            <p style="font-size:18px;margin-bottom:12px;">暂无学生登记记录</p>
+            <a href="{{ url_for('students.add') }}" class="btn btn-primary">+ 新增登记</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

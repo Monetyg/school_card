@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}校园卡登记系统{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<header class="navbar">
+    <div class="navbar-inner">
+        <a href="{{ url_for('students.index') }}" class="brand">荆楚理工移动卡登记</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('students.index') }}" class="nav-link {% if request.endpoint == 'students.index' %}active{% endif %}">学生列表</a>
+            <a href="{{ url_for('students.add') }}" class="nav-link {% if request.endpoint == 'students.add' %}active{% endif %}">新增登记</a>
+            <a href="{{ url_for('stats.index') }}" class="nav-link {% if request.endpoint == 'stats.index' %}active{% endif %}">统计</a>
+        </nav>
+        <div class="nav-user">
+            <span class="username">{{ current_user.username }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">退出</a>
+        </div>
+    </div>
+</header>
+{% endif %}
+
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">荆楚理工移动卡登记</div>
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

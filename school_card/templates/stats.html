@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}统计 - 荆楚理工移动卡登记{% endblock %}
+{% block content %}
+{% set status_style_map = {"未办理": "bar-pending", "办理中": "bar-processing", "已办理": "bar-done", "已激活": "bar-activated"} %}
+{% set badge_style_map = {"未办理": "badge-pending", "办理中": "badge-processing", "已办理": "badge-done", "已激活": "badge-activated"} %}
+
+<div class="card">
+    <div class="card-title">统计概览</div>
+
+    <!-- 总数 -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-value">{{ total }}</div>
+            <div class="stat-label">登记总人数</div>
+        </div>
+        {% for status in status_choices %}
+        <div class="stat-card">
+            <div class="stat-value">{{ status_counts.get(status, 0) }}</div>
+            <div class="stat-label">
+                <span class="badge {{ badge_style_map.get(status, 'badge-pending') }}">{{ status }}</span>
+            </div>
+            {% if total > 0 %}
+            <div class="stat-bar">
+                <div class="{{ status_style_map.get(status, 'bar-pending') }}" style="width: {{ (status_counts.get(status, 0) / total * 100)|round(1) }}%"></div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 学院排行 -->
+    <div class="card-title" style="margin-top:12px;">学院排行</div>
+    {% if college_counts %}
+    <ol class="rank-list">
+        {% set max_count = college_counts.values()|max %}
+        {% for college in colleges %}
+        {% set count = college_counts.get(college, 0) %}
+        <li class="rank-item">
+            <span class="rank-num">{{ loop.index }}</span>
+            <span class="rank-name">{{ college }}</span>
+            {% if total > 0 %}
+            <div class="rank-bar-track">
+                <div style="width: {{ (count / max_count * 100)|round(1) if max_count > 0 else 0 }}%"></div>
+            </div>
+            {% endif %}
+            <span class="rank-count">{{ count }} 人</span>
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p style="text-align:center;color:var(--gray-500);padding:30px 0;">暂无数据</p>
+    {% endif %}
+</div>
+{% endblock %}
